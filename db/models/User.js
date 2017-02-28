@@ -1,5 +1,6 @@
 var db = require('../connect');
 var Sequelize = require('sequelize');
+var bcrypt = require('bcrypt');
 
 var User = db.define('user', {
   firstName: {
@@ -19,6 +20,21 @@ var User = db.define('user', {
   }
 }, {
   freezeTableName: true // Model tableName will be the same as the model name
+});
+
+// force: true will drop the table if it already exists
+User.sync().then(function () {
+  // Table created
+  return bcrypt.hash('woohoo', 4);
+}).then(function(encrypted) {
+  return User.create({
+    firstName: 'John',
+    lastName: 'Hancock',
+    email: 'jhancock@gmail.com',
+    pass: encrypted
+  });
+}).catch(function(error) {
+  console.error('Error seeding the DB with John Hancock. ', error)
 });
 
 module.exports = User;

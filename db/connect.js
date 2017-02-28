@@ -1,7 +1,6 @@
 var Sequelize = require('sequelize');
-var env = require('../env');
 
-var db = new Sequelize('jardin', 'paeeon', null, {
+var db = new Sequelize('jardin', 'lilyjen', null, {
   host: 'localhost',
   dialect: 'postgres',
   port: 5432,
@@ -15,12 +14,3 @@ var db = new Sequelize('jardin', 'paeeon', null, {
 module.exports = db;
 
 var User = require('./models/User');
-
-// // force: true will drop the table if it already exists
-// User.sync({force: true}).then(function () {
-//   // Table created
-//   return User.create({
-//     firstName: 'John',
-//     lastName: 'Hancock'
-//   });
-// });
