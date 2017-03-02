@@ -1,6 +1,7 @@
 var Sequelize = require('sequelize');
+var env = require('../env');
 
-var db = new Sequelize('jardin', 'lilyjen', null, {
+var db = new Sequelize('jardin', 'lilyjen', env.psqlPassword, {
   host: 'localhost',
   dialect: 'postgres',
   port: 5432,
