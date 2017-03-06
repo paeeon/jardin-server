@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
+var fs = require('fs');
 var User = require('../db/models/User');
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
+var ms = require('ms');
 var env = require('../env');
 
 router.post('/users/register', function(req, res) {
@@ -12,8 +14,7 @@ router.post('/users/register', function(req, res) {
        return User.create({
          email: req.body.email,
          pass: encrypted,
-         firstName: req.body.firstName,
-         lastName: req.body.lastName
+         firstName: req.body.firstName
        });
     }).then(function(user) {
       res.send(user);
@@ -22,38 +23,40 @@ router.post('/users/register', function(req, res) {
 
 router.post('/users/login', function(req, res) {
   res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  console.log('This is the req.body', req.body);
   var foundUser;
-  User.findOne({
+  return User.findOne({
     where: {
       email: req.body.email
     }
   }).then(function(user) {
     foundUser = user;
-    return bcrypt.hash(req.body.pass);
-  }).then(function(encrypted) {
+    return bcrypt.compare(req.body.pass, user.pass);
+  }).then(function(result) {
+    console.log("The result of the bcrypt compare is", result);
     // If the user successfully entered their password…
-    if (encrypted === foundUser.pass) {
-      jwt.sign(
+    if (result) {
+      return jwt.sign(
         // payload
         {
           "iss": "playjard.in",
-          "exp": "3 months",
+          "exp": ms('3 months'),
           "firstName": foundUser.firstName,
-          "lastName": foundUser.lastName,
           "email": foundUser.email,
           "id": foundUser.id
         },
         // secret
         env.jwtSecret,
         // algorithm
-        { algorithm: 'RS256' },
+        { algorithm: 'HS256' },
         // callback
         function tokenSignDone(err, token) {
           if (err) {
-            console.error('An error occurred while signing the JWT:', err);
+            console.error(err);
+            throw new Error('An error occurred while signing the JWT!');
           }
           console.log('JWT signed! here it is', token);
-          res.send(token)
+          res.send(token);
         }
       );
     } else {
