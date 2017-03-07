@@ -7,10 +7,6 @@ var User = db.define('user', {
     type: Sequelize.STRING,
     field: 'first_name' // Will result in an attribute that is firstName when user facing but first_name in the database
   },
-  lastName: {
-    type: Sequelize.STRING,
-    field: 'last_name'
-  },
   email: {
     type: Sequelize.STRING,
     unique: true
@@ -29,7 +25,6 @@ User.sync().then(function () {
 }).then(function(encrypted) {
   return User.create({
     firstName: 'John',
-    lastName: 'Hancock',
     email: 'jhancock@gmail.com',
     pass: encrypted
   });

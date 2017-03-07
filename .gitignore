@@ -1,2 +1,5 @@
 node_modules
 env.js
+private.pem
+public.pem
+.DS_Store
