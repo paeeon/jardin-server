@@ -40,7 +40,7 @@ router.post('/users/login', function(req, res) {
         // payload
         {
           "iss": "playjard.in",
-          "exp": ms('3 months'),
+          "exp": ms('2 weeks'),
           "firstName": foundUser.firstName,
           "email": foundUser.email,
           "id": foundUser.id
@@ -56,12 +56,13 @@ router.post('/users/login', function(req, res) {
             throw new Error('An error occurred while signing the JWT!');
           }
           console.log('JWT signed! here it is', token);
-          res.send(token);
+          res.status(200).send(token);
         }
       );
     } else {
       // If the user entered the wrong password…
       console.error('Wrong password entered!');
+      res.status(400).send('Wrong password entered!');
     }
   })
 })
