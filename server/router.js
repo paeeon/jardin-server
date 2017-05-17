@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var chalk = require('chalk');
 var fs = require('fs');
 var User = require('../db/models/User');
 var bcrypt = require('bcrypt');
@@ -8,7 +9,7 @@ var ms = require('ms');
 var env = require('../env');
 
 router.post('/users/register', function(req, res) {
-  res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  // res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
   bcrypt.hash(req.body.pass, 4)
     .then(function(encrypted) {
        return User.create({
@@ -22,7 +23,7 @@ router.post('/users/register', function(req, res) {
 });
 
 router.post('/users/login', function(req, res) {
-  res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
+  // res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
   console.log('This is the req.body', req.body);
   var foundUser;
   return User.findOne({
@@ -40,10 +41,9 @@ router.post('/users/login', function(req, res) {
         // payload
         {
           "iss": "playjard.in",
-          "exp": ms('2 weeks'),
+          "exp": ms('2 minutes'),
           "firstName": foundUser.firstName,
-          "email": foundUser.email,
-          "id": foundUser.id
+          "email": foundUser.email
         },
         // secret
         env.jwtSecret,
@@ -65,7 +65,14 @@ router.post('/users/login', function(req, res) {
       res.status(400).send('Wrong password entered!');
     }
   })
-})
+});
+
+router.get('/users/verify', function(req, res) {
+  jwt.verify(req.get('Authorization').split(' ')[1], env.jwtSecret, function(err, decoded) {
+    if (err) res.status(400).send(err)
+    else res.status(200).send(decoded);
+  });
+});
 
 router.use('/', function(req, res) {
   res.send('hello world');
