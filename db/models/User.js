@@ -21,7 +21,7 @@ var User = db.define('user', {
   freezeTableName: true // Model tableName will be the same as the model name
 });
 
-// force: true will drop the table if it already exists
+// Passing {force: true} will drop the table if it already exists
 User.sync().then(function () {
   // Table created
   return bcrypt.hash('woohoo', 4);

@@ -10,7 +10,8 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.use(function(req, res, next) {
   res.set({
     "Access-Control-Allow-Origin": "http://localhost:3000",
-    "Access-Control-Allow-Headers": "Authorization"
+    "Access-Control-Allow-Headers": "Authorization",
+    "Access-Control-Allow-Methods": "POST, GET, PATCH"
   });
   next();
 });

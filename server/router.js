@@ -31,7 +31,9 @@ router.post('/users/login', function(req, res) {
       email: req.body.email
     }
   }).then(function(user) {
+    if (!user) res.status(400).send("User doesn't exist!");
     foundUser = user;
+    console.log('this is the user', user);
     return bcrypt.compare(req.body.pass, user.pass);
   }).then(function(result) {
     console.log("The result of the bcrypt compare is", result);
@@ -41,9 +43,10 @@ router.post('/users/login', function(req, res) {
         // payload
         {
           "iss": "playjard.in",
-          "exp": ms('2 minutes'),
+          "exp": ms('2 weeks'),
           "firstName": foundUser.firstName,
-          "email": foundUser.email
+          "email": foundUser.email,
+          "id": foundUser.id
         },
         // secret
         env.jwtSecret,
@@ -57,6 +60,12 @@ router.post('/users/login', function(req, res) {
           }
           console.log('JWT signed! here it is', token);
           res.status(200).send(token);
+          console.log('Response sent. Now to save the JWT to the db...');
+          foundUser.sessionJwt = token;
+          return foundUser.save()
+            .then(function(changedUser) {
+              console.log(chalk.green('JWT saved to user!', changedUser));
+            }).catch(errorHandler);
         }
       );
     } else {
@@ -65,6 +74,21 @@ router.post('/users/login', function(req, res) {
       res.status(400).send('Wrong password entered!');
     }
   })
+});
+
+router.patch('/users/logout/:id', function(req, res) {
+  console.log(chalk.blue('from PATCH /users/logout, req: ', req.body));
+  return User.findOne({
+    where: {
+      id: req.params.id
+    }
+  }).then(function(foundUser) {
+    foundUser.sessionJwt = null;
+    return foundUser.save();
+  }).then(function(savedUser) {
+    console.log(chalk.green(`User #${req.params.id}'s session has been removed! Here is the updated user: `, savedUser));
+    res.status(200).send();
+  }).catch(errorHandler);
 });
 
 router.get('/users/verify', function(req, res) {
