@@ -33,10 +33,10 @@ router.post('/users/login', function(req, res) {
   }).then(function(user) {
     if (!user) res.status(400).send("User doesn't exist!");
     foundUser = user;
-    console.log('this is the user', user);
+    console.log(chalk.blue('this is the user', user));
     return bcrypt.compare(req.body.pass, user.pass);
   }).then(function(result) {
-    console.log("The result of the bcrypt compare is", result);
+    console.log(chalk.blue("The result of the bcrypt compare is", result));
     // If the user successfully entered their password…
     if (result) {
       return jwt.sign(
@@ -96,10 +96,6 @@ router.get('/users/verify', function(req, res) {
     if (err) res.status(400).send(err)
     else res.status(200).send(decoded);
   });
-});
-
-router.use('/', function(req, res) {
-  res.send('hello world');
 });
 
 function errorHandler(error) {

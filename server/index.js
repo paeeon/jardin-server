@@ -3,9 +3,13 @@ var app = express();
 var router = require('./router');
 var bodyParser = require('body-parser');
 var db = require('../db/connect');
+var morgan = require('morgan');
+var chalk = require('chalk');
 
 app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+
+app.use(morgan('dev'));
 
 app.use(function(req, res, next) {
   res.set({
